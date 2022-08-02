@@ -51,7 +51,7 @@ RUN python3 -m pip install mysql-connector-python
 
 
 # Comment out if not using ACV->ONNX
-RUN python3 -m pip install onnx>=1.8.1 
+RUN python3 -m pip install onnx==1.8.1 
 
 # Comment out if not using YOLOv5->ONNX
 RUN python3 -m pip install torch torchvision
