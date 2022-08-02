@@ -1,6 +1,6 @@
 # Written by Jon Coons, Azure AI GBB at Microsoft.
 
-FROM arm64v8/python:3.7-slim-buster
+FROM visionaccelerator.azurecr.io/edge_base/arm64v8/python:3.7-slim-buster
 
 COPY qemu-aarch64-static /usr/bin/qemu-aarch64-static
 RUN cd /usr/bin && chmod a+rwx qemu-aarch64-static

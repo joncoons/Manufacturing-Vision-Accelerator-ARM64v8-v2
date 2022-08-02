@@ -25,44 +25,90 @@ def send_to_upstream(msg_str: str) -> None:
 
 class CaptureInferenceStore():
 
-    def __init__(self, camGvspAllied, camGvspBasler, camRTSP, camFile, camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, modelACV,
-                modelYOLOv5, modelName, modelVersion, targetDim, probThres, iouThres, retrainInterval, storeRawFrames, storeAllInferences, SqlDb, SqlPwd):
+    def __init__(self, camGvspAllied, camGvspBasler, camRTSP, camFile, camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, 
+        modelAcvOD, modelAcvMultiClass, modelAcvMultiLabel, modelAcvOcr, modelAcvOcrUri, modelAcvOcrSecondary, modelYolov5, modelFasterRCNN, modelRetinanet, modelMaskRCNN, modelClassMultiLabel, modelClassMultiClass, 
+        modelName, modelVersion, targetDim, probThres, iouThres, retrainInterval, storeRawFrames, storeAllInferences,):
 
         modelPath = f'/model_volume/{modelName}/{modelVersion}/model.onnx'
-        labelPath = f'/model_volume/{modelName}/{modelVersion}/labels.txt'
+        labelPath = f'/model_volume/{modelName}/labels.json'
         modelFile = f'{modelName}-v.{modelVersion}'
-        labelFile = 'labels.txt'
-        sleep(5)
-        if modelACV:
-            from inference.onnxruntime_predict import initialize_acv
+        labelFile = 'labels.json'
+
+        sleep(3)
+
+        if modelAcvOD:
+            from inference.ort_acv_predict import initialize_acv
+            labelPath = f'/model_volume/{modelName}/labels.txt'
+            labelFile = 'labels.txt'
             initialize_acv(modelPath, labelPath)
-        else:
-            from inference.onnxruntime_yolov5 import initialize_yolov5
+        elif modelAcvMultiClass:
+            from inference.ort_acv_mc_class import initialize_acv_mc_class
+            labelPath = f'/model_volume/{modelName}/labels.txt'
+            labelFile = 'labels.txt'
+            initialize_acv_mc_class(modelPath, labelPath)
+        elif modelAcvMultiLabel:
+            from inference.ort_acv_ml_class import initialize_acv_ml_class
+            labelPath = f'/model_volume/{modelName}/labels.txt'
+            labelFile = 'labels.txt'
+            initialize_acv_ml_class(modelPath, labelPath)
+        elif modelYolov5:
+            from inference.ort_yolov5 import initialize_yolov5
             initialize_yolov5(modelPath, labelPath, targetDim, probThres, iouThres)
+        elif modelFasterRCNN:
+            from inference.ort_faster_rcnn import initialize_faster_rcnn
+            initialize_faster_rcnn(modelPath, labelPath, targetDim, probThres, iouThres)
+        elif modelRetinanet:
+            from inference.ort_retinanet import initialize_retinanet
+            initialize_retinanet(modelPath, labelPath, targetDim, probThres, iouThres)
+        elif modelMaskRCNN:
+            from inference.ort_mask_rcnn import initialize_mask_rcnn
+            initialize_mask_rcnn(modelPath, labelPath, targetDim, probThres, iouThres)
+        elif modelClassMultiLabel:
+            from inference.ort_class_multi_label import initialize_class_multi_label
+            initialize_class_multi_label(modelPath, labelPath, targetDim, probThres, iouThres)
+        elif modelClassMultiClass:
+            from inference.ort_class_multi_class import initialize_class_multi_class
+            initialize_class_multi_class(modelPath, labelPath, targetDim, probThres, iouThres)
+        else:
+            print('No model selected')
+
         sleep(1)
 
         if camGvspAllied:     
             from capture.allied.camera_gvsp_allied import Allied_GVSP_Camera
-            Allied_GVSP_Camera(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, modelACV, modelFile, labelFile, 
-                targetDim, probThres, iouThres, retrainInterval, SqlDb, SqlPwd, storeRawFrames, storeAllInferences, send_to_upload, send_to_upstream)
+            Allied_GVSP_Camera(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, 
+            modelAcvOD, modelAcvMultiClass, modelAcvMultiLabel, modelAcvOcr, modelAcvOcrUri, modelAcvOcrSecondary, 
+            modelYolov5, modelFasterRCNN, modelRetinanet, modelMaskRCNN, modelClassMultiLabel, modelClassMultiClass, 
+            modelName, modelVersion, targetDim, probThres, iouThres, retrainInterval, storeRawFrames, storeAllInferences, 
+            modelFile, labelFile, send_to_upload, send_to_upstream)
 
-        elif camGvspBasler:     
+
+        if camGvspBasler:     
             from capture.basler.camera_gvsp_basler import Basler_GVSP_Camera
-            Basler_GVSP_Camera(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, modelACV, modelFile, labelFile, 
-                targetDim, probThres, iouThres, retrainInterval, SqlDb, SqlPwd, storeRawFrames, storeAllInferences, send_to_upload, send_to_upstream)
+            Basler_GVSP_Camera(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, 
+            modelAcvOD, modelAcvMultiClass, modelAcvMultiLabel, modelAcvOcr, modelAcvOcrUri, modelAcvOcrSecondary, 
+            modelYolov5, modelFasterRCNN, modelRetinanet, modelMaskRCNN, modelClassMultiLabel, modelClassMultiClass, 
+            modelName, modelVersion, targetDim, probThres, iouThres, retrainInterval, storeRawFrames, storeAllInferences, 
+            modelFile, labelFile, send_to_upload, send_to_upstream)
             
         elif camRTSP:
             from capture.RTSP.camera_rtsp import RTSP_Camera
-            RTSP_Camera(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, modelACV, modelFile, labelFile, 
-                targetDim, probThres, iouThres, retrainInterval, SqlDb, SqlPwd, storeRawFrames, storeAllInferences, send_to_upload, send_to_upstream)
+            RTSP_Camera(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, 
+            modelAcvOD, modelAcvMultiClass, modelAcvMultiLabel, modelAcvOcr, modelAcvOcrUri, modelAcvOcrSecondary, 
+            modelYolov5, modelFasterRCNN, modelRetinanet, modelMaskRCNN, modelClassMultiLabel, modelClassMultiClass, 
+            modelName, modelVersion, targetDim, probThres, iouThres, retrainInterval, storeRawFrames, storeAllInferences, 
+            modelFile, labelFile, send_to_upload, send_to_upstream)
 
         elif camFile:
             from capture.file.camera_file import Cam_File_Sink
-            Cam_File_Sink(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, modelACV, modelFile, labelFile, 
-                targetDim, probThres, iouThres, retrainInterval, SqlDb, SqlPwd, storeRawFrames, storeAllInferences, send_to_upload, send_to_upstream)
+            Cam_File_Sink(camID, camTrigger, camURI, camLocation, camPosition, camFPS, inferenceFPS, 
+            modelAcvOD, modelAcvMultiClass, modelAcvMultiLabel, modelAcvOcr, modelAcvOcrUri, modelAcvOcrSecondary, 
+            modelYolov5, modelFasterRCNN, modelRetinanet, modelMaskRCNN, modelClassMultiLabel, modelClassMultiClass, 
+            modelName, modelVersion, targetDim, probThres, iouThres, retrainInterval, storeRawFrames, storeAllInferences, 
+            modelFile, labelFile, send_to_upload, send_to_upstream)
 
         else:
-            print("No camera found")
+            print("No camera selected")
  
 def __convertStringToBool(env: str) -> bool:
     if env in ['true', 'True', 'TRUE', '1', 'y', 'YES', 'Y', 'Yes']:
@@ -82,7 +128,7 @@ def run_CIS():
 
     config_read = open("/config/variables.pkl", "rb")
     variables = pickle.load(config_read)
-    # print(f"Variables: \n{variables}")
+    print(f"Variables: \n{variables}")
 
     if variables["CAMERA_FPS"]:
         CAMERA_FPS = float(variables["CAMERA_FPS"])
@@ -94,34 +140,90 @@ def run_CIS():
     else: 
         INFERENCE_FPS = float(1)
 
+    # for ACV models
     os.environ["IOU_THRES"] = variables["IOU_THRES"]
     os.environ['TARGET_DIM'] = variables["TARGET_DIM"]
     os.environ["PROB_THRES"] = variables["PROB_THRES"]
 
+    camera_type = variables["CAMERA_TYPE"]
+    camGvspAllied_value = False
+    camGvspBasler_value = False
+    camRTSP_value = False
+    camFile_value = False
+    if camera_type == 'Allied Vision GVSP':
+        camGvspAllied_value = True
+    elif camera_type == 'Basler GVSP':
+        camGvspBasler_value = True
+    elif camera_type == 'RTSP Camera':
+        camRTSP_value = True
+    elif camera_type == 'Read from file':
+        camFile_value = True
+
+
+    model_type = variables["MODEL_TYPE"]
+    modelAcvOD_value = False
+    modelAcvMultiClass_value = False
+    modelAcvMultiLabel_value = False
+    modelAcvOcr_value = False
+    modelYolov5_value = False
+    modelFasterRCNN_value = False
+    modelRetinanet_value = False 
+    modelClassMultiLabel_value = False
+    modelClassMultiClass_value = False
+    modelMaskRCNN_value = False
+    if model_type == 'Azure Custom Vision - Object Detection':
+        modelAcvOD_value = True
+    elif model_type == 'Azure Custom Vision - Multi-Class Classification':
+        modelAcvMultiClass_value = True
+    elif model_type == 'Azure Custom Vision - Multi-Label Classification':
+        modelAcvMultiLabel_value = True
+    elif model_type == 'Azure Computer Vision - OCR Read':
+        modelAcvOcr_value = True
+    elif model_type == 'AutoML for Images - YOLOv5':
+        modelYolov5_value = True
+    elif model_type == 'AutoML for Images - Faster-RCNN':
+        modelFasterRCNN_value = True
+    elif model_type == 'AutoML for Images - Retinanet':
+        modelRetinanet_value = True
+    elif model_type == 'AutoML for Images - Multi-Label Classification':
+        modelClassMultiLabel_value = True
+    elif model_type == 'AutoML for Images - Multi-Class Classification':
+        modelClassMultiClass_value = True
+    elif model_type == 'AutoML for Images - Mask-RCNN':
+        modelMaskRCNN_value = True
+
     CaptureInferenceStore(
-        camGvspAllied = (variables["CAMERA_GVSP_ALLIED"]), 
-        camGvspBasler = (variables["CAMERA_GVSP_BASLER"]),
-        camRTSP = (variables["CAMERA_RTSP"]), 
-        camFile = (variables["CAMERA_FILE"]), 
+        camGvspAllied = camGvspAllied_value, 
+        camGvspBasler = camGvspBasler_value,
+        camRTSP = camRTSP_value, 
+        camFile = camFile_value, 
         camID = variables["CAMERA_ID"],
-        camTrigger = (variables["CAMERA_TRIGGER"]), 
+        camTrigger = variables["CAMERA_TRIGGER"], 
         camURI = variables["CAMERA_URI"], 
         camLocation = variables["CAMERA_LOCATION"], 
         camPosition = variables["CAMERA_POSITION"], 
         camFPS = CAMERA_FPS, 
         inferenceFPS = INFERENCE_FPS, 
-        modelACV = variables["MODEL_ACV"],
-        modelYOLOv5 = variables["MODEL_YOLOV5"],
+        modelAcvOD = modelAcvOD_value,
+        modelAcvMultiClass = modelAcvMultiClass_value,
+        modelAcvMultiLabel = modelAcvMultiLabel_value,
+        modelAcvOcr = modelAcvOcr_value,
+        modelAcvOcrUri = variables["MODEL_ACV_OCR_URI"],
+        modelAcvOcrSecondary = variables["MODEL_ACV_OCR_SECONDARY"],
+        modelYolov5 = modelYolov5_value,
+        modelFasterRCNN = modelFasterRCNN_value,
+        modelRetinanet = modelRetinanet_value,
+        modelClassMultiLabel = modelClassMultiLabel_value,
+        modelClassMultiClass = modelClassMultiClass_value,
+        modelMaskRCNN = modelMaskRCNN_value,
         modelName = variables["MODEL_NAME"], 
         modelVersion = variables["MODEL_VERSION"], 
         targetDim = int(variables["TARGET_DIM"]), 
         probThres = float(variables["PROB_THRES"]), 
         iouThres = float(variables["IOU_THRES"]), 
         retrainInterval = int(variables["RETRAIN_INTERVAL"]), 
-        storeRawFrames = (variables["STORE_RAW_FRAMES"]), 
-        storeAllInferences = (variables["STORE_ALL_INFERENCES"]), 
-        SqlDb = variables["MSSQL_DB"], 
-        SqlPwd = variables["MSSQL_PWD"],
+        storeRawFrames = variables["STORE_RAW_FRAMES"], 
+        storeAllInferences = variables["STORE_ALL_INFERENCES"], 
         )
         
 def twin_update():
