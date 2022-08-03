@@ -4,7 +4,13 @@
 # You can skip the docker push if you only need a local copy.  I've created an anonymous pull in ACR for convenience:  docker pull visionaccelerator.azurecr.io/iot_edge_configuration_tool_local:0.0.1-amd64
 # To run, simply execute 'sudo docker run -d -p 22001:22001 --rm -it visionaccelerator.azurecr.io/iot_edge_configuration_tool_local:0.0.1-amd64'.  The container will open up ephemeral port 22394, so use a browser to navigate to http://localhost:22394 if running locally.
 # 
-# For v2, use 'sudo docker run -d -p 22001:22001 --rm -it visionaccelerator.azurecr.io/iot_edge_configuration_tool_local_v2:0.2.1-amd64' for convenience.
+# For v2, the dockerfile is: 'visionaccelerator.azurecr.io/iot_edge_configuration_tool_local_v2:0.2.1-amd64' for convenience.  To run it, you'll need to pass in the Azure Storage
+# connection string and the name of the container where your models are stored:
+
+# docker run -d -p 22000:22000 --rm -it ^
+# 	-e STORE_CONN_STR="DefaultEndpointsProtocol=https;AccountName=aiotblob;AccountKey=j/Ebmubii9I6DMogO9YdEI7QSSyKhshohEqMw74+36ORVwAzMRj/jpHPWp2kR1Xvcd9VZVtW9Io++AStbJ/faQ==;EndpointSuffix=core.windows.net" ^
+# 	-e BLOB_AZURE_MODEL_CONTAINER="model-sync" ^
+# 	visionaccelerator.azurecr.io/iot_edge_configuration_tool_local_v2:0.2.1-amd64
 # 
 # If you want to back up your configuration to a local directory, you can create a bind mount like this:
 #  sudo docker run -d -p 22000:22000 --rm -it --mount type=bind,src=<your_local_dir_path>,dst=/config visionaccelerator.azurecr.io/iot_edge_configuration_tool:0.0.1-amd64
