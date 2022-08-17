@@ -83,10 +83,10 @@
               }
             }
           },
-          "Mfg_Vision_Model_Sync": {
+          "Mfg_Vision_v2_Model_Sync": {
             "startupOrder": 2,
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Model_Sync}",
+              "image": "${MODULES.Mfg_Vision_v2_Model_Sync}",
               "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/edge_assets/model_sync:/models\"]}}"
             },
             "type": "docker",
@@ -105,35 +105,35 @@
             "status": "running",
             "restartPolicy": "always"
           },
-          "Mfg_Vision_Capture_Repo": {
+          "Mfg_Vision_v2_Capture_Repo": {
             "startupOrder": 3,
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Capture_Repo}",
+              "image": "${MODULES.Mfg_Vision_v2_Capture_Repo}",
               "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/edge_assets/capture_volume:/capture_volume\"]},\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"capture_volume\",\"Target\":\"/var/opt/capture_volume\"}]}"
             }
           },
-          "Mfg_Vision_Inference_Repo": {
+          "Mfg_Vision_v2_Inference_Repo": {
             "startupOrder": 4,
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Inference_Repo}",
+              "image": "${MODULES.Mfg_Vision_v2_Inference_Repo}",
               "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/edge_assets/inference_volume:/inference_volume\"]},\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"inference_volume\",\"Target\":\"/var/opt/inference_volume\"}]}"
             }
           },
-          "Mfg_Vision_Image_Upload": {
+          "Mfg_Vision_v2_Image_Upload": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Image_Upload}",
+              "image": "${MODULES.Mfg_Vision_v2_Image_Upload}",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/images_volume\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images\"}]}}"
             },
             "env": {
@@ -145,13 +145,13 @@
               }
             }
           },
-          "Mfg_Vision_File_Cleanup": {
+          "Mfg_Vision_v2_File_Cleanup": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_File_Cleanup}",
+              "image": "${MODULES.Mfg_Vision_v2_File_Cleanup}",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/images_volume\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images_volume\"}]}}"
             },
             "env": {
@@ -160,23 +160,23 @@
               }
             }
           },
-          "Mfg_Vision_mySQL": {
+          "Mfg_Vision_v2_mySQL": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_mySQL}",
+              "image": "${MODULES.Mfg_Vision_v2_mySQL}",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/mysql_data:/var/lib_mysql\"],\"PortBindings\":{\"3306/tcp\":[{\"HostPort\":\"3306\"}]}},\"Env\":[\"MYSQL_DATABASE=defectdb\",\"MYSQL_USER=SA\",\"MYSQL_PASSWORD=Password123\"]}"
             }
           },
-          "Mfg_Vision_Dashboard_Custom": {
+          "Mfg_Vision_v2_Dashboard_Custom": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Dashboard_Custom}",
+              "image": "${MODULES.Mfg_Vision_v2_Dashboard_Custom}",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"PortBindings\":{\"80/tcp\":[{\"HostPort\":\"22000\"}]},\"IpcMode\":\"host\",\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/app/static/images\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images_volume\"}]}}"
             },
             "env": {
