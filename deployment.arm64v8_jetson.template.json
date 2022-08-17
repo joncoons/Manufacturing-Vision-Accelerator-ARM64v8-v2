@@ -165,10 +165,10 @@
               }
             }
           },
-          "Mfg_Vision_Model_Sync": {
+          "Mfg_Vision_v2_Model_Sync": {
             "startupOrder": 2,
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Model_Sync}",
+              "image": "${MODULES.Mfg_Vision_v2_Model_Sync}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -193,14 +193,14 @@
             "status": "running",
             "restartPolicy": "always"
           },
-          "Mfg_Vision_Capture_Repo": {
+          "Mfg_Vision_v2_Capture_Repo": {
             "startupOrder": 3,
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Capture_Repo}",
+              "image": "${MODULES.Mfg_Vision_v2_Capture_Repo}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -217,14 +217,14 @@
               }
             }
           },
-          "Mfg_Vision_Inference_Repo": {
+          "Mfg_Vision_v2_Inference_Repo": {
             "startupOrder": 4,
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Inference_Repo}",
+              "image": "${MODULES.Mfg_Vision_v2_Inference_Repo}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -241,13 +241,13 @@
               }
             }
           },
-          "Mfg_Vision_Image_Upload": {
+          "Mfg_Vision_v2_Image_Upload": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Image_Upload}",
+              "image": "${MODULES.Mfg_Vision_v2_Image_Upload}",
               "createOptions": {
                 "NetworkingConfig": {
                   "EndpointsConfig": {
@@ -278,13 +278,13 @@
               }
             }
           },
-          "Mfg_Vision_File_Cleanup": {
+          "Mfg_Vision_v2_File_Cleanup": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_File_Cleanup}",
+              "image": "${MODULES.Mfg_Vision_v2_File_Cleanup}",
               "createOptions": {
                 "NetworkingConfig": {
                   "EndpointsConfig": {
@@ -312,13 +312,13 @@
               }
             }
           },
-          "Mfg_Vision_mySQL": {
+          "Mfg_Vision_v2_mySQL": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_mySQL}",
+              "image": "${MODULES.Mfg_Vision_v2_mySQL}",
               "createOptions": {
                 "NetworkingConfig": {
                   "EndpointsConfig": {
@@ -346,13 +346,13 @@
               }
             }
           },
-          "Mfg_Vision_Dashboard_Custom": {
+          "Mfg_Vision_v2_Dashboard_Custom": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_Dashboard_Custom}",
+              "image": "${MODULES.Mfg_Vision_v2_Dashboard_Custom}",
               "createOptions": {
                 "NetworkingConfig": {
                   "EndpointsConfig": {

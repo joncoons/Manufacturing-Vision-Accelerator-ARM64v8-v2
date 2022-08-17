@@ -2,7 +2,7 @@
   "$schema-version": "0.0.1",
   "description": "",
   "image": {
-    "repository": "${ACR_ADDR}/mfg_vision_file_cleanup",
+    "repository": "${ACR_ADDR}/mfg_vision_v2_capture_repo",
     "tag": {
       "version": "${CONTAINER_VERSION_TAG}",
       "platforms": {
