@@ -67,13 +67,56 @@
           }
         },
         "modules": {
-          "Mfg_Vision_CIS_Camera_1": {
+          "Mfg_Vision_CIS_v2_Monolithic": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.Mfg_Vision_CIS_Camera_1}",
+              "image": "${MODULES.Mfg_Vision_CIS_v2_Monolithic}",
+              "createOptions": {
+                "NetworkingConfig": {
+                  "EndpointsConfig": {
+                    "host": {}
+                  }
+                },
+                "HostConfig": {
+                  "IpcMode": "host",
+                  "gpus": 0,
+                  "runtime": "nvidia",
+                  "NetworkMode": "host",
+                  "Binds": [
+                    "/home/edge_assets/images_volume:/images_volume",
+                    "/home/edge_assets/model_sync:/model_volume",
+                    "/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_v2_Monolithic:/image_sink_volume",
+                    "/home/edge_assets/CIS_Config/Mfg_Vision_CIS_v2_Monolithic:/config"
+                  ],
+                  "Mounts": [
+                    {
+                      "Type": "volume",
+                      "Source": "images_volume",
+                      "Target": "/var/opt/images_volume"
+                    }
+                  ]
+                }
+              }
+            },
+            "env": {
+              "MYSQL_DATABASE": {
+                "value": "${MYSQL_DB}"
+              },
+              "MYSQL_PWD": {
+                "value": "${MYSQL_SA_PASSWORD}"
+              }
+            }
+          },
+          "Mfg_Vision_CIS_v2_Modular": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.Mfg_Vision_CIS_v2_Modular}",
               "createOptions": {
                 "NetworkingConfig": {
                   "EndpointsConfig": {
@@ -90,8 +133,8 @@
                     "/home/edge_assets/model_sync:/model_volume",
                     "/home/edge_assets/inference_volume:/app/inference",
                     "/home/edge_assets/capture_volume:/app/capture",
-                    "/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_Camera_1:/image_sink_volume",
-                    "/home/edge_assets/CIS_Config/Mfg_Vision_CIS_Camera_1:/config"
+                    "/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_v2_Modular:/image_sink_volume",
+                    "/home/edge_assets/CIS_Config/Mfg_Vision_CIS_v2_Modular:/config"
                   ],
                   "Mounts": [
                     {
@@ -111,6 +154,14 @@
                     }
                   ]
                 }
+              }
+            },
+            "env": {
+              "MYSQL_DATABASE": {
+                "value": "${MYSQL_DB}"
+              },
+              "MYSQL_PWD": {
+                "value": "${MYSQL_SA_PASSWORD}"
               }
             }
           },
@@ -353,8 +404,10 @@
       "properties.desired": {
         "schemaVersion": "1.1",
         "routes": {
-          "Mfg_Vision_CIS_Camera1_Inference_Upload": "FROM /messages/modules/Mfg_Vision_CIS_Camera1/outputs/outputInference INTO $upstream",
-          "Mfg_Vision_CIS_Camera1_Image_Upload": "FROM /messages/modules/Mfg_Vision_CIS_Camera1/outputs/outputImageSend INTO BrokeredEndpoint(\"/modules/Mfg_Vision_Image_Upload/inputs/inputImageSend\")"
+          "Mfg_Vision_CIS_v2_Monolithic_Inference_Upload": "FROM /messages/modules/Mfg_Vision_CIS_v2_Monolithic/outputs/outputInference INTO $upstream",
+          "Mfg_Vision_CIS_v2_Monolithic_Image_Upload": "FROM /messages/modules/Mfg_Vision_CIS_v2_Monolithic/outputs/outputImageSend INTO BrokeredEndpoint(\"/modules/Mfg_Vision_Image_Upload/inputs/inputImageSend\")",
+          "Mfg_Vision_CIS_v2_Modular_Inference_Upload": "FROM /messages/modules/Mfg_Vision_CIS_v2_Modular/outputs/outputInference INTO $upstream",
+          "Mfg_Vision_CIS_v2_Modular_Image_Upload": "FROM /messages/modules/Mfg_Vision_CIS_v2_Modular/outputs/outputImageSend INTO BrokeredEndpoint(\"/modules/Mfg_Vision_Image_Upload/inputs/inputImageSend\")"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

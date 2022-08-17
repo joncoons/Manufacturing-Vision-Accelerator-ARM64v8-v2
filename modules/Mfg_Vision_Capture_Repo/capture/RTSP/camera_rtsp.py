@@ -13,7 +13,7 @@ import numpy as np
 from datetime import datetime
 from capture.frame_preprocess import frame_resize
 from capture.frame_save import FrameSave
-from store.sql_insert import InsertInference
+from store.mysql_insert import InsertInference
 from PIL import Image
 
 class RTSP_Camera():

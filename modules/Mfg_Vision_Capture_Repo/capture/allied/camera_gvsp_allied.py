@@ -14,7 +14,7 @@ from datetime import datetime
 from capture.allied.vimba import *
 from capture.frame_preprocess import frame_resize
 from capture.frame_save import FrameSave
-from store.sql_insert import InsertInference
+from store.mysql_insert import InsertInference
 
 capturing = False
 
