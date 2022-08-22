@@ -58,20 +58,27 @@ def frame_resize(img, target, model):
         scaled_frame = cv2.copyMakeBorder(scaled_frame, pad_top, pad_bot, pad_left, pad_right, borderType=cv2.BORDER_CONSTANT, value=padColor)        
         return scaled_frame
         
-    elif model in ('faster_rcnn', 'mask_rcnn'):
+    elif model in ('faster_rcnn', 'retinanet', 'mask_rcnn'):
         padColor = [0,0,0]
+        target_ratio = target/800
         h, w = img.shape[:2]
-        ratio = target / min(h, w)
+        ratio = target / max(h, w)
+        # ratio = target / h
+        print(f'Ratio: {ratio}')
         new_w = int(w * ratio)
         new_h = int(h * ratio)
+        print(f'New H x W: {new_h} x {new_w}')
         if h > new_h or w > new_w: # shrinking 
             interp = cv2.INTER_AREA
         else: # stretching 
             interp = cv2.INTER_CUBIC
-        aspect = w/h  
+        # aspect = w/h  
+        # print(f'Aspect: {aspect}')
         scaled_frame = cv2.resize(img, (new_w, new_h), interpolation=interp)
-        sh = int(math.ceil(scaled_frame.shape[0] / 32) * 32)
-        sw = int(math.ceil(scaled_frame.shape[1] / 32) * 32)
+        # sh = int(math.ceil(scaled_frame.shape[0] / 32) * 32)
+        # sw = int(math.ceil(scaled_frame.shape[1] / 32) * 32)
+        sh = target
+        sw = target / target_ratio
         print (f'Original resize: {scaled_frame.shape[:2]}, Padded resize: {(sh, sw)}')
         # padded_frame = np.zeros((sh, sw, 3), dtype=np.float32)
         # padded_frame[:h, :w, :] = scaled_frame
@@ -91,7 +98,8 @@ def frame_resize(img, target, model):
         else:
             pad_top, pad_bot = 0, 0
 
-        scaled_frame = cv2.copyMakeBorder(scaled_frame, pad_top, pad_bot, pad_left, pad_right, borderType=cv2.BORDER_CONSTANT, value=padColor)        
+        scaled_frame = cv2.copyMakeBorder(scaled_frame, pad_top, pad_bot, pad_left, pad_right, borderType=cv2.BORDER_CONSTANT, value=padColor) 
+
         return scaled_frame
 
     elif model in ('ocr'):

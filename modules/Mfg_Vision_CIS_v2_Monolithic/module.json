@@ -2,7 +2,7 @@
   "$schema-version": "0.0.1",
   "description": "",
   "image": {
-    "repository": "${ACR_ADDR}/mfg_vision_cis_v2_modular",
+    "repository": "${ACR_ADDR}/mfg_vision_cis_v2_monolithic",
     "tag": {
       "version": "${CONTAINER_VERSION_TAG}",
       "platforms": {

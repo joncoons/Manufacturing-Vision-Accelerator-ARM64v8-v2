@@ -36,7 +36,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "docker :1.2.10-linux-arm64v8",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.2.10-linux-arm64v8",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
@@ -107,6 +107,9 @@
               },
               "MYSQL_PWD": {
                 "value": "${MYSQL_SA_PASSWORD}"
+              },
+              "BOUNDARY_DETECTION": {
+                "value": "false"
               }
             }
           },
@@ -162,6 +165,9 @@
               },
               "MYSQL_PWD": {
                 "value": "${MYSQL_SA_PASSWORD}"
+              },
+              "BOUNDARY_DETECTION": {
+                "value": "false"
               }
             }
           },

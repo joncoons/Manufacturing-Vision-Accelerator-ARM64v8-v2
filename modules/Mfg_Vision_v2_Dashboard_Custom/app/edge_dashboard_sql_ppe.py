@@ -12,6 +12,7 @@ from flask import Flask, render_template, redirect, url_for
 
 app = Flask(__name__)
 
+
 def sql_connect():
     with pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};PORT='+sql_port+';SERVER='+sql_server+';DATABASE='+sql_db+';UID='+sql_uid+';PWD='+ sql_pwd) as sql_conn:
         sql_conn.autocommit = True
@@ -37,12 +38,12 @@ def q_detections(unique_id):
     return q_2_results
 
 def q_pass_fail():
-    q_3 = _sql.execute("SELECT COUNT(a.object_detected) FROM InferenceData AS a WHERE a.object_detected = ? ", 0)
+    q_3 = _sql.execute("""SELECT COUNT(tag_name) FROM DetectionData WHERE tag_name = ? or tag_name = ? """, "hardhat", "safety_vest")
     q_3_results = q_3.fetchone()
     p_count = len(q_3_results)
     for p in range(p_count):
         p_val = q_3_results[p]
-    q_4 = _sql.execute("SELECT COUNT(a.object_detected) FROM InferenceData AS a WHERE a.object_detected = ? ", 1)
+    q_4 = _sql.execute("""SELECT COUNT(tag_name) FROM DetectionData WHERE tag_name = ? or tag_name = ? """, "no_hardhat", "no_safety_vest")
     q_4_results = q_4.fetchone()
     f_count = len(q_4_results)
     for p in range(f_count):
@@ -70,21 +71,26 @@ def index():
     for cam in cams:        
         inf_vals = q_inference(cam)
         inf_count = len(inf_vals)
-        print(inf_count)
+        print(f'Inference Cound: {inf_count}')
         for inf_val in inf_vals:
             inf_dict = list_to_dict(inf_keys, inf_val)
-            inf_list.append(inf_dict)
             inf_unique_id = inf_dict['unique_id']
             det_vals = q_detections(inf_unique_id)
+            fail_count = 0
             for det_val in det_vals:
+                if det_val[0] == "no_hardhat" or det_val[0] == "no_safety_vest":
+                    fail_count += 1
                 det_dict = list_to_dict(det_keys, det_val)
                 det_list.append(det_dict)
+            print(f"Fail Count: {fail_count}")
+            inf_dict['fail_count'] = fail_count
+            inf_list.append(inf_dict)
     inf_count = (len(inf_list))
     det_count = (len(det_list))
 
     p,f = q_pass_fail()
 
-    return render_template('index.html', inf_count=inf_count, det_count = det_count, inf_list = inf_list, det_list=det_list, p=p, f=f)
+    return render_template('index_ppe.html', inf_count=inf_count, det_count = det_count, inf_list = inf_list, det_list=det_list, p=p, f=f)
 
 if __name__ == '__main__':
 
@@ -96,12 +102,12 @@ if __name__ == '__main__':
     except ValueError as error:
         print(error)
         sys.exit(1)
-        
+
     sql_server = 'localhost'
     sql_port = '1433'
     sql_uid = 'SA'
     print('DRIVER={ODBC Driver 17 for SQL Server};PORT='+sql_port+';SERVER='+sql_server+';DATABASE='+sql_db+';UID='+sql_uid+';PWD='+ sql_pwd)
-
+    
     app.run(host='0.0.0.0', port=23000)
 
 

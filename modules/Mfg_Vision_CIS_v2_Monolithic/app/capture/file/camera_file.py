@@ -55,8 +55,8 @@ class Cam_File_Sink():
         self.retrainInterval = retrainInterval
         self.storeRawFrames = storeRawFrames
         self.storeAllInferences = storeAllInferences
-        self.SqlDb = os.environ["MYSQL_DB"]
-        self.SqlPwd = os.environ["MYSQL_SA_PASSWORD"]
+        self.SqlDb = os.environ["MYSQL_DATABASE"]
+        self.SqlPwd = os.environ["MYSQL_PWD"]
         self.model_name = modelName
         self.model_version = modelVersion
         self.send_to_upload = send_to_upload
@@ -84,6 +84,7 @@ class Cam_File_Sink():
                     self.cycle_begin = time.time()
                     self.frameCount += 1
                     img_path = os.path.join(("/image_sink_volume"), filename)
+                    current = os.path.dirname(os.path.abspath(__file__))
                     frame = cv2.imread(img_path)
                     h, w = frame.shape[:2]
                     if ((self.modelAcvOcr == True) and (self.modelAcvOcrSecondary != True)):
@@ -103,6 +104,7 @@ class Cam_File_Sink():
 
                     elif self.modelAcvOD:
                         model_type = 'Object Detection'
+                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         frame_optimized = frame_resize(frame, self.targetDim, model = "acv")
                         from inference.ort_acv_predict import predict_acv
                         pil_frame = Image.fromarray(frame_optimized)
@@ -122,17 +124,33 @@ class Cam_File_Sink():
                         annotated_frame = frame_resized.copy()
                     elif self.modelFasterRCNN:
                         model_type = 'Object Detection'
+                        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         frame_optimized = frame_resize(frame, self.targetDim, model = "faster_rcnn")
+                        pil_frame = Image.fromarray(frame_optimized)
+                        pil_frame = pil_frame.convert('RGB')
                         from inference.ort_faster_rcnn import predict_faster_rcnn
-                        result = predict_faster_rcnn(frame_optimized)
+                        result = predict_faster_rcnn(pil_frame)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()
+                    elif self.modelRetinanet:
+                        model_type = 'Object Detection'
+                        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        frame_optimized = frame_resize(frame, self.targetDim, model = "retinanet")
+                        # pil_frame = Image.fromarray(frame_optimized)
+                        # pil_frame = pil_frame.convert('RGB')
+                        from inference.ort_retinanet import predict_retinanet
+                        result = predict_retinanet(frame_optimized)
+                        predictions = result['predictions']
+                        frame_resized = frame_optimized.copy()
+                        annotated_frame = frame_optimized.copy()    
                     elif self.modelMaskRCNN:
                         model_type = 'Instance Segmentation'
                         frame_optimized = frame_resize(frame, self.targetDim, model = "mask_rcnn")
+                        pil_frame = Image.fromarray(frame_optimized)
+                        pil_frame = pil_frame.convert('RGB')
                         from inference.ort_mask_rcnn import predict_mask_rcnn
-                        result = predict_mask_rcnn(frame_optimized)
+                        result = predict_mask_rcnn(pil_frame)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()
@@ -144,8 +162,10 @@ class Cam_File_Sink():
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()
+                        annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
                     elif self.modelClassMultiClass:
                         model_type = 'Multi-Class Classification'
+                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         frame_optimized = frame_resize(frame, self.targetDim, model = "classification")
                         from inference.ort_class_multi_class import predict_class_multi_class
                         result = predict_class_multi_class(frame_optimized)
@@ -188,7 +208,7 @@ class Cam_File_Sink():
 
                             ocr_inference_obj = {
                                 'model_name': self.model_name,
-                                'object_detected': obj_det_val,
+                                'object_detected': 1,
                                 'camera_id': self.camID,
                                 'camera_name': f"{self.camLocation}-{self.camPosition}",
                                 'raw_image_name': frameFileName,
@@ -269,7 +289,7 @@ class Cam_File_Sink():
                                 thickness1 = 1
                                 thickness2 = 1
                                 if bounding_box:
-                                    if self.modelACV:
+                                    if self.modelAcvOD:
                                         height, width, channel = annotated_frame.shape
                                         xmin = int(bounding_box["left"] * width)
                                         xmax = int((bounding_box["left"] * width) + (bounding_box["width"] * width))
@@ -373,14 +393,13 @@ class Cam_File_Sink():
 
                         else:
                             if self.storeAllInferences:
-                                obj_det_val = 0
                                 annotatedName = frameFileName
                                 annotatedPath = frameFilePath
        
 
                         inference_obj = {
                             'model_name': self.model_name,
-                            'object_detected': obj_det_val,
+                            'object_detected': 0,
                             'camera_id': self.camID,
                             'camera_name': f"{self.camLocation}-{self.camPosition}",
                             'raw_image_name': frameFileName,

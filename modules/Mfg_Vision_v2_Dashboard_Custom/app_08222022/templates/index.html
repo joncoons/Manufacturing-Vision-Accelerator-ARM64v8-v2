@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %}Workplace Safety Scoring Dashboard {% endblock %}</h1>
+<h1>{% block title %}Azure IoT Edge Inference Outputs {% endblock %}</h1>
 
 <table width="1200">
     <tr>
         <th width=25%></th> 
         <th width=25%></th> 
-        <th width=25% text-align="right" text-color="03690c"><h5>PPE Compliant Events: {{ p }}</h5></th> 
-        <th width=25% text-align="right" text-color="af0202"><h5>PPE Infraction Events: {{ f }}</h5></th> 
+        <th width=25% text-align="right" text-color="03690c"><h5>Total Passed: {{ p }}</h5></th> 
+        <th width=25% text-align="right" text-color="af0202"><h5>Total Failed: {{ f }}</h5></th> 
     </tr>
     <tr>
         {% for i in range(inf_count) %}
@@ -19,10 +19,10 @@
     </tr>
     <tr>
         {% for i in range(inf_count) %}
-        {% if inf_list[i]['fail_count'] > 0 %}
-        <td style="background-color:#af0202" halign="center"><h3>PPE Infraction</h3></td>
+        {% if inf_list[i]['object_detected'] > 0 %}
+        <td style="background-color:#af0202" halign="center"><h3>Object Detected</h3></td>
         {% else %}
-        <td style="background-color:#03690c" halign="center"><h3>PPE Compliant</h3></td>
+        <td style="background-color:#03690c" halign="center"><h3>Passed</h3></td>
         {% endif %}
         {% endfor %}
     </tr>
@@ -34,11 +34,9 @@
             <p>Inference Time: {{ inf_list[i]['inferencing_time'] }}</p>
                 {% for j in range(det_count) %}
                     {% if inf_list[i]['unique_id'] == det_list[j]['unique_id'] %}
-                        {% if det_list[j]['tag_name'] == "no_hardhat" or det_list[j]['tag_name'] == "no_safety_vest" %}
-                            <p><FONT COLOR="#ff0000"><b>{{ det_list[j]['tag_name'] }} : {{ det_list[j]['probability'] }}%</b></FONT></p>
-                        {% else %}
-                            <p>{{ det_list[j]['tag_name'] }} : {{ det_list[j]['probability'] }}%</p>
-                        {% endif %}
+                        <p>Detection Name: {{ det_list[j]['tag_name'] }}</p>
+                        <p>Confidence: <b>{{ det_list[j]['probability'] }}</b></p>
+
                     {% endif %}
                 {% endfor %}
             <p>{{ inf_list[i]['created'] }}</p>
