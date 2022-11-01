@@ -104,8 +104,6 @@ def initialize_faster_rcnn(model_path, labels_path, target_dim, target_prob, tar
 
 def predict_faster_rcnn(image):
     log_msg('Predicting image')
-    # frame = np.asarray(image)
-    # frame = frame.astype(np.float32)
     frame = image.transpose(2, 0, 1)
     mean_vec = np.array([0.485, 0.456, 0.406])
     std_vec = np.array([0.229, 0.224, 0.225])

@@ -1,10 +1,20 @@
 import os
+import sys
 import pickle
+from pathlib import Path
 from typing import Any, Union
 from threading import Thread
 from time import sleep
 from twin_call import TwinUpdater
 from azure.iot.device import IoTHubModuleClient, Message
+# from inference import *
+
+cur_dir = os.getcwd()
+print(f"Current directory: {cur_dir}")
+sys.path.append(cur_dir)
+path = Path(cur_dir)
+cur_path = str(path.parent.absolute())
+sys.path.append(cur_path)
 
 class HubConnector():
 
