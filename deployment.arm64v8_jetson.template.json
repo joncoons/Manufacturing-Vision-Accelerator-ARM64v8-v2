@@ -70,7 +70,7 @@
           "Mfg_Vision_CIS_v2_Monolithic": {
             "version": "1.0",
             "type": "docker",
-            "status": "running",
+            "status": "stopped",
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.Mfg_Vision_CIS_v2_Monolithic}",
@@ -108,6 +108,46 @@
               "MYSQL_PWD": {
                 "value": "${MYSQL_SA_PASSWORD}"
               },
+              "BOUNDARY_DETECTION": {
+                "value": "false"
+              }
+            }
+          },
+          "Mfg_Vision_CIS_v2_Modular": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.Mfg_Vision_CIS_v2_Modular}",
+              "createOptions": {
+                "NetworkingConfig": {
+                  "EndpointsConfig": {
+                    "host": {}
+                  }
+                },
+                "HostConfig": {
+                  "IpcMode": "host",
+                  "NetworkMode": "host",
+                  "Binds": [
+                    "/home/edge_assets/images_volume:/images_volume",
+                    "/home/edge_assets/model_sync:/model_volume",
+                    "/home/edge_assets/inference_volume:/app/inference",
+                    "/home/edge_assets/capture_volume:/app/capture",
+                    "/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_v2_Modular:/image_sink_volume",
+                    "/home/edge_assets/CIS_Config/Mfg_Vision_CIS_v2_Modular:/config"
+                  ],
+                  "Mounts": [
+                    {
+                      "Type": "volume",
+                      "Source": "images_volume",
+                      "Target": "/var/opt/images_volume"
+                    }
+                  ]
+                }
+              }
+            },
+            "env": {
               "BOUNDARY_DETECTION": {
                 "value": "false"
               }
@@ -165,6 +205,7 @@
               }
             }
           },
+          
           "Mfg_Vision_v2_Inference_Repo": {
             "startupOrder": 4,
             "version": "1.0",
