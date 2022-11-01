@@ -10,18 +10,11 @@ RUN apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
     python3-pip \
     python3-dev \
-    # libmariadb3 \
-    # libmariadb-dev \
-    # libmariadb-dev-compat \
     gcc \
     cmake
 
-# RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash
-# RUN apt update
-
 RUN python3 -m pip install --upgrade pip setuptools wheel
 RUN python3 -m pip install --upgrade flask 
-# RUN python3 -m pip install --upgrade mariadb
 RUN python3 -m pip install mysql-connector-python
 
 EXPOSE 23000

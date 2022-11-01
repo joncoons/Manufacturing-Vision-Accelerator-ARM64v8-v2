@@ -71,9 +71,9 @@ class Cam_File_Sink():
     def cap_stored_image(self):
         while True:
             img_list = os.listdir("/image_sink_volume")
-            sleep(2)
+            sleep(1)
             if not img_list:
-                time.sleep(15)
+                time.sleep(1)
                 continue
             for filename in img_list:
                 if self.check_extension(filename):

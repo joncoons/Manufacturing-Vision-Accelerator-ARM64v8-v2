@@ -22,7 +22,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.2.10-linux-arm64v8",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4.0-linux-arm64v8",
               "createOptions": {}
             },
             "env": {
@@ -36,7 +36,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.2.10-linux-arm64v8",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4.0-linux-arm64v8",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
@@ -96,64 +96,6 @@
                       "Type": "volume",
                       "Source": "images_volume",
                       "Target": "/var/opt/images_volume"
-                    }
-                  ]
-                }
-              }
-            },
-            "env": {
-              "MYSQL_DATABASE": {
-                "value": "${MYSQL_DB}"
-              },
-              "MYSQL_PWD": {
-                "value": "${MYSQL_SA_PASSWORD}"
-              },
-              "BOUNDARY_DETECTION": {
-                "value": "false"
-              }
-            }
-          },
-          "Mfg_Vision_CIS_v2_Modular": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.Mfg_Vision_CIS_v2_Modular}",
-              "createOptions": {
-                "NetworkingConfig": {
-                  "EndpointsConfig": {
-                    "host": {}
-                  }
-                },
-                "HostConfig": {
-                  "IpcMode": "host",
-                  "gpus": 0,
-                  "runtime": "nvidia",
-                  "NetworkMode": "host",
-                  "Binds": [
-                    "/home/edge_assets/images_volume:/images_volume",
-                    "/home/edge_assets/model_sync:/model_volume",
-                    "/home/edge_assets/inference_volume:/app/inference",
-                    "/home/edge_assets/capture_volume:/app/capture",
-                    "/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_v2_Modular:/image_sink_volume",
-                    "/home/edge_assets/CIS_Config/Mfg_Vision_CIS_v2_Modular:/config"
-                  ],
-                  "Mounts": [
-                    {
-                      "Type": "volume",
-                      "Source": "images_volume",
-                      "Target": "/var/opt/images_volume"
-                    },
-                    {
-                      "Type": "volume",
-                      "Source": "inference_volume",
-                      "Target": "/var/opt/inference_volume"
-                    },
-                    {
-                      "Type": "volume",
-                      "Source": "capture_volume",
-                      "Target": "/var/opt/capture_volume"
                     }
                   ]
                 }
@@ -234,7 +176,8 @@
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
-                    "/home/edge_assets/inference_volume:/inference_volume"
+                    "/home/edge_assets/inference_volume:/inference_volume",
+                    "/home/edge_assets/image_sink_volume/test_images:/test_images"
                   ]
                 },
                 "Mounts": [

@@ -34,7 +34,7 @@ class InsertInference():
         self.t_end = time.time()
         self.t_insert = 0
 
-        print(f"SQL package:  {json.dumps(inference)}")
+        # print(f"SQL package:  {json.dumps(inference)}")
         self.create_record()
     
     def create_record(self):
@@ -77,7 +77,7 @@ class InsertInference():
                                 )
 
             i = int(0)
-            print(type(self.detections))
+            # print(type(self.detections))
             if self.detection_count > 0:
                 for i in range(int(self.detection_count)):
                     self.tag_id = self.detections[i]['labelId']

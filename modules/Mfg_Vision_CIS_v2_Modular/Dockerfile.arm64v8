@@ -49,7 +49,7 @@ RUN cp /opt/Vimba_5_1/Tools/Viewer/Bin/arm_64bit/libVimbaC.so /usr/lib/aarch64-l
 RUN python3 -m pip install --upgrade pip wheel setuptools
 RUN python3 -m pip install pybind11 pytest
 RUN python3 -m pip install cython numpy>=1.19.0 pillow 
-RUN python3 -m pip install opencv-python-headless~=4.5.5 opencv-contrib-python-headless~=4.5.5 
+RUN python3 -m pip install opencv-contrib-python-headless~=4.5.5 
 RUN python3 -m pip install azure-iot-device~=2.7.0 shapely
 RUN python3 -m pip install mysql-connector-python
 

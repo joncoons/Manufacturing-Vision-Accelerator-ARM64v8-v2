@@ -1,0 +1,35 @@
+FROM nvcr.io/nvidia/l4t-base:r32.5.0
+# FROM nvcr.io/nvidia/l4t-pytorch:r32.5.0-pth1.7-py3
+
+ARG DEBIAN_FRONTEND=noninteractive
+COPY qemu-aarch64-static /usr/bin/qemu-aarch64-static
+RUN cd /usr/bin && chmod a+rwx qemu-aarch64-static
+
+RUN mkdir /ocr_modules && chmod -R 777 /ocr_modules
+RUN mkdir /test_images && chmod -R 777 /test_images
+COPY ocr_modules /ocr_modules
+COPY test_images /test_images
+
+RUN apt update && apt upgrade -y
+RUN apt update && apt install -y --no-install-recommends \
+    # libomp-dev \
+    # libopenblas-dev \
+    python3-pip \
+    python3-dev \
+    # libprotobuf-dev \
+    # protobuf-compiler \
+    libgeos-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install --upgrade pip wheel setuptools
+RUN python3 -m pip install pybind11 pytest
+# RUN python3 -m pip install cython numpy>=1.19.0 pillow
+# RUN python3 -m pip install opencv-contrib-python-headless~=4.5.5 shapely
+# RUN python3 -m pip install torch==1.8.1 torchvision==0.9.1
+# RUN python3 -m pip install scipy seaborn requests 
+RUN python3 -m pip install easyocr
+
+WORKDIR /app
+COPY /app/ .
+
+CMD [ "python3", "-u", "./ocr_read.py" ]

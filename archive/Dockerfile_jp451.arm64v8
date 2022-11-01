@@ -1,0 +1,73 @@
+FROM visionaccelerator.azurecr.io/edge_base/arm64v8/l4t_pytorch_cv2src_ort_152:0.0.1-arm64v8
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+COPY qemu-aarch64-static /usr/bin/qemu-aarch64-static
+RUN cd /usr/bin && chmod a+rwx qemu-aarch64-static
+
+# Create folder structure and set permissions
+# When combined with deployment manifest, an edge_assets directory will be created on the host device
+RUN mkdir /model_volume && chmod -R 777 /model_volume
+RUN mkdir /images_volume && chmod -R 777 /images_volume
+RUN mkdir /image_sink_volume && chmod -R 777 /image_sink_volume
+RUN mkdir /config && chmod -R 777 /config
+
+# RUN apt-get update
+
+# Shapely prereq
+RUN apt update && apt install -y --no-install-recommends \
+    libgeos-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Comment out if not using ACV->ONNX
+# RUN apt install -y --no-install-recommends \
+#     libprotobuf-dev protobuf-compiler && \
+#     rm -rf /var/lib/apt/lists/*
+
+# Comment out if not using Allied Vision camera
+COPY VimbaSDK/Vimba_v5.1_ARM64.tgz /opt
+RUN cd /opt && tar -zxvf Vimba_v5.1_ARM64.tgz && rm -rf *.tgz
+RUN cd /opt/Vimba_5_1/VimbaGigETL && ./Install.sh
+ENV GENICAM_GENTL64_PATH="/opt/Vimba_5_1/VimbaGigETL/CTI/arm_64bit"
+RUN echo "$GENICAM_GENTL64_PATH"
+RUN cd /opt/Vimba_5_1/Tools/Viewer/Bin/arm_64bit && chmod +x libVimbaC.so && chown root:root libVimbaC.so 
+RUN cp /opt/Vimba_5_1/Tools/Viewer/Bin/arm_64bit/libVimbaC.so /usr/lib/aarch64-linux-gnu
+
+# ONNX & ONNX runtime, OpenCV foundational packages
+RUN python3 -m pip install pybind11 pytest
+RUN python3 -m pip install cython pillow 
+RUN python3 -m pip install azure-iot-device~=2.7.0 shapely
+RUN python3 -m pip install mysql-connector-python
+
+# Comment out if not using YOLOv5->ONNX
+RUN python3 -m pip install scipy requests
+
+# Comment out if not using ACV->ONNX
+# RUN python3 -m pip install onnx==1.8.1
+
+# Comment out if not using Basler
+# RUN python3 -m pip install pypylon
+
+# Comment out if not using Allied Vision camera
+#Pulled from https://stackoverflow.com/questions/55313610/importerror-libgl-so-1-cannot-open-shared-object-file-no-such-file-or-directo
+RUN apt clean
+RUN apt update && apt install -y --no-install-recommends \
+    ffmpeg \
+    libsm6 \
+    libxext6 && \
+    rm -rf /var/lib/apt/lists/*
+# /////////////////////////////////////////
+WORKDIR /app
+
+COPY /app/ .
+
+ENV OPENBLAS_CORETYPE=ARMV8:$OPENBLAS_CORETYPE
+ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1:$LD_PRELOAD
+ENV LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
+ENV PATH=/usr/local/cuda-10.2/bin:$PATH
+ENV PATH=/usr/lib/aarch64-linux-gnu:$PATH
+RUN ldconfig
+ENV PYTHONPATH=$PYTHONPATH:/app/inference
+
+
+CMD [ "python3", "-u", "./main.py" ]

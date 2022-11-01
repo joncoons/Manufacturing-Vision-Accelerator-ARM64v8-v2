@@ -4,8 +4,11 @@ RUN apt update && apt upgrade -y
 
 RUN mkdir /inference_temp && chmod 777 -R /inference_temp
 RUN mkdir /inference_volume && chmod -R 777 /inference_volume
+RUN mkdir /test_images_temp && chmod 777 -R /test_images_temp
+RUN mkdir /test_images && chmod 777 -R /test_images
 
 COPY /inference /inference_temp
+COPY /test_images /test_images_temp
 
 WORKDIR /app
 

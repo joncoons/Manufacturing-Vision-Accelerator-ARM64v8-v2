@@ -1,0 +1,97 @@
+# syntax=docker/dockerfile:experimental
+#
+# This Dockerfile just installs pre-built ONNX Runtime wheel inside the image.
+# Please make sure you have nvidia-runtime enabled in docker config and then build like:
+#
+# sudo -H DOCKER_BUILDKIT=1 nvidia-docker build -f Dockerfile.jetson -t <your repo>.azurecr.io/edge_base/arm64v8/onnxruntime_jp451:1.5.2-arm64v8 . && sudo docker push <your repo>.azurecr.io/edge_base/arm64v8/onnxruntime_jp451:1.5.2-arm64v8
+#
+
+FROM nvcr.io/nvidia/l4t-pytorch:r32.5.0-pth1.7-py3
+ENV runtime=nvidia
+ENV OPENBLAS_CORETYPE=ARMV8
+ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+
+ARG INSTALL_FOLDER=cv2_files
+ARG DEBIAN_FRONTEND=noninteractive
+
+
+RUN apt update -y
+RUN apt install -y --no-install-recommends -y software-properties-common  
+RUN add-apt-repository universe && add-apt-repository multiverse && add-apt-repository restricted && add-apt-repository main
+
+RUN apt update -y && apt upgrade -y
+
+RUN wget http://launchpadlibrarian.net/516139268/libjasper1_1.900.1-debian1-2.4ubuntu1.3_arm64.deb \
+    && wget http://launchpadlibrarian.net/516139264/libjasper-dev_1.900.1-debian1-2.4ubuntu1.3_arm64.deb \
+    && dpkg -i libjasper1_1.900.1-debian1-2.4ubuntu1.3_arm64.deb \
+    && dpkg -i libjasper-dev_1.900.1-debian1-2.4ubuntu1.3_arm64.deb \
+    && apt update && rm -f *.deb
+
+RUN apt install --no-install-recommends -y \
+    libgfortran4 \
+    libopenblas-base \
+    libopenmpi-dev \
+    build-essential \
+    cmake \
+    libgtk2.0-dev \
+    pkg-config \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    python3-dev \
+    python-dev \
+    python-numpy \
+    python3-numpy \
+    python3-pip \
+    libtbb2 \
+    libtbb-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libjasper-dev \
+    libdc1394-22-dev \
+    libwebp-dev \
+    libv4l-dev \
+    v4l-utils \
+    qv4l2 \
+    v4l2ucp \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p ${INSTALL_FOLDER}
+RUN cd ${INSTALL_FOLDER} && curl -L \
+    https://github.com/opencv/opencv/archive/4.5.1.zip -o opencv-4.5.1.zip \
+    && curl -L https://github.com/opencv/opencv_contrib/archive/4.5.1.zip -o opencv_contrib-4.5.1.zip \
+    && unzip opencv-4.5.1.zip && unzip opencv_contrib-4.5.1.zip 
+
+RUN mkdir -p ${INSTALL_FOLDER}/opencv-4.5.1/release \
+    && cd ${INSTALL_FOLDER}/opencv-4.5.1/release \
+    && cmake -D WITH_CUDA=ON -D ENABLE_PRECOMPILED_HEADERS=OFF \
+    -D CUDA_ARCH_BIN="7.2" -D CUDA_ARCH_PTX="" \
+    -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.5.1/modules \
+    -D WITH_GSTREAMER=ON -D WITH_LIBV4L=ON -D BUILD_opencv_python2=ON \
+    -D BUILD_opencv_python3=ON -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF \
+    -D BUILD_EXAMPLES=OFF -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+RUN cd ${INSTALL_FOLDER}/opencv-4.5.1/release \
+    && make -j8 \
+    && make install
+RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
+    && ldconfig
+
+RUN rm -rf ${INSTALL_FOLDER} \
+    && apt autoremove --purge \
+    && apt clean
+
+RUN python3 -m pip install --upgrade pip wheel setuptools
+RUN python3 -m pip install protobuf~=3.17.3
+
+WORKDIR /onnxruntime
+
+ARG WHEEL_FILE=onnxruntime_gpu-1.5.2-cp36-cp36m-linux_aarch64.whl
+
+COPY ${WHEEL_FILE} .
+
+RUN basename ${WHEEL_FILE} | xargs pip3 install 

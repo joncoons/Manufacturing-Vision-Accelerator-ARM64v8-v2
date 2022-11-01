@@ -75,9 +75,9 @@ class Cam_File_Sink():
     def cap_stored_image(self):
         while True:
             img_list = os.listdir("/image_sink_volume")
-            sleep(2)
+            sleep(1)
             if not img_list:
-                time.sleep(15)
+                time.sleep(1)
                 continue
             for filename in img_list:
                 if self.check_extension(filename):
@@ -88,34 +88,25 @@ class Cam_File_Sink():
                     frame = cv2.imread(img_path)
                     h, w = frame.shape[:2]
                     if ((self.modelAcvOcr == True) and (self.modelAcvOcrSecondary != True)):
+                        from inference.ocr_read import _process_frame_for_ocr
                         model_type = 'OCR'
                         frame_optimized = frame_resize(frame, self.targetDim, model = "ocr")
-                        headers = {'Content-Type': 'application/octet-stream'}
                         encodedFrame = cv2.imencode('.jpg', frame_optimized)[1].tobytes()
-                        try:
-                            ocr_response = requests.post(self.modelAcvOcrUri, headers = headers, data = encodedFrame)
-                            ocr_url = ocr_response.headers["Operation-Location"]
-                            result = None
-                            while result is None:
-                                result = self.get_response(ocr_url)
-                        except Exception as e:
-                            print('Send to OCR Exception -' + str(e))
-                            result = "[]"
-
+                        result = _process_frame_for_ocr(encodedFrame)
+                        frame_resized = frame_optimized.copy()
                     elif self.modelAcvOD:
-                        model_type = 'Object Detection'
-                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        frame_optimized = frame_resize(frame, self.targetDim, model = "acv")
                         from inference.ort_acv_predict import predict_acv
+                        model_type = 'Object Detection'
+                        frame_optimized = frame_resize(frame, self.targetDim, model = "acv")
                         pil_frame = Image.fromarray(frame_optimized)
                         result = predict_acv(pil_frame)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()
                     elif self.modelYolov5:
+                        from inference.ort_yolov5 import predict_yolov5
                         model_type = 'Object Detection'
                         frame_optimized, ratio, pad_list = frame_resize(frame, self.targetDim, model = "yolov5")
-                        from inference.ort_yolov5 import predict_yolov5
                         result = predict_yolov5(frame_optimized, pad_list)
                         predictions = result['predictions'][0]
                         new_w = int(ratio[0]*w)
@@ -123,51 +114,40 @@ class Cam_File_Sink():
                         frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
                         annotated_frame = frame_resized.copy()
                     elif self.modelFasterRCNN:
-                        model_type = 'Object Detection'
-                        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        frame_optimized = frame_resize(frame, self.targetDim, model = "faster_rcnn")
-                        pil_frame = Image.fromarray(frame_optimized)
-                        pil_frame = pil_frame.convert('RGB')
                         from inference.ort_faster_rcnn import predict_faster_rcnn
-                        result = predict_faster_rcnn(pil_frame)
+                        model_type = 'Object Detection'
+                        frame_optimized, ratio, padding = frame_resize(frame, self.targetDim, model = "faster_rcnn")
+                        result = predict_faster_rcnn(frame_optimized)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()
                     elif self.modelRetinanet:
-                        model_type = 'Object Detection'
-                        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        frame_optimized = frame_resize(frame, self.targetDim, model = "retinanet")
-                        # pil_frame = Image.fromarray(frame_optimized)
-                        # pil_frame = pil_frame.convert('RGB')
                         from inference.ort_retinanet import predict_retinanet
+                        model_type = 'Object Detection'
+                        frame_optimized, ratio, padding = frame_resize(frame, self.targetDim, model = "retinanet")
                         result = predict_retinanet(frame_optimized)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()    
                     elif self.modelMaskRCNN:
-                        model_type = 'Instance Segmentation'
-                        frame_optimized = frame_resize(frame, self.targetDim, model = "mask_rcnn")
-                        pil_frame = Image.fromarray(frame_optimized)
-                        pil_frame = pil_frame.convert('RGB')
                         from inference.ort_mask_rcnn import predict_mask_rcnn
-                        result = predict_mask_rcnn(pil_frame)
+                        model_type = 'Instance Segmentation'
+                        frame_optimized, ratio, padding = frame_resize(frame, self.targetDim, model = "mask_rcnn")
+                        result = predict_mask_rcnn(frame_optimized)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
-                        annotated_frame = frame_optimized.copy()
                     elif self.modelClassMultiLabel:
+                        from inference.ort_class_multi_label import predict_class_multi_label
                         model_type = 'Multi-Label Classification'
                         frame_optimized = frame_resize(frame, self.targetDim, model = "classification")
-                        from inference.ort_class_multi_label import predict_class_multi_label
                         result = predict_class_multi_label(frame_optimized)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
                         annotated_frame = frame_optimized.copy()
-                        annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
                     elif self.modelClassMultiClass:
-                        model_type = 'Multi-Class Classification'
-                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        frame_optimized = frame_resize(frame, self.targetDim, model = "classification")
                         from inference.ort_class_multi_class import predict_class_multi_class
+                        model_type = 'Multi-Class Classification'
+                        frame_optimized = frame_resize(frame, self.targetDim, model = "classification")
                         result = predict_class_multi_class(frame_optimized)
                         predictions = result['predictions']
                         frame_resized = frame_optimized.copy()
@@ -175,9 +155,6 @@ class Cam_File_Sink():
                     else:
                         print("No model selected")
                         result = None
-                    
-                    if result is not None:
-                        print(json.dumps(result))
 
                     now = datetime.now()
                     created = now.isoformat()
@@ -244,9 +221,6 @@ class Cam_File_Sink():
                             'detected_objects': predictions
                             }
 
-                            sql_insert = InsertInference(self.SqlDb, self.SqlPwd, detection_count, inference_obj)           
-                            self.send_to_upstream(json.dumps(inference_obj))
-
                             # For establishing boundary area - comment out if not used
                             boundary_active = self.__convertStringToBool(os.environ['BOUNDARY_DETECTION'])
                             work_polygon = Polygon(self.work_boundary)
@@ -264,7 +238,7 @@ class Cam_File_Sink():
                                 # color = (0, 255, 0)
                                 # thickness = 1
                                 # if bounding_box:
-                                #     if self.modelACV:
+                                #     if self.modelAcvOD:
                                 #         height, width, channel = annotated_frame.shape
                                 #         xmin = int(bounding_box["left"] * width)
                                 #         xmax = int((bounding_box["left"] * width) + (bounding_box["width"] * width))
@@ -322,7 +296,7 @@ class Cam_File_Sink():
                                 # thickness1 = 1
                                 # thickness2 = 1
                                 # if bounding_box:
-                                #     if self.modelACV:
+                                #     if self.modelAcvOD:
                                 #         height, width, channel = annotated_frame.shape
                                 #         xmin = int(bounding_box["left"] * width)
                                 #         xmax = int((bounding_box["left"] * width) + (bounding_box["width"] * width))
@@ -391,26 +365,22 @@ class Cam_File_Sink():
                                 }
                             self.send_to_upload(json.dumps(annotated_msg))
 
-                        else:
-                            if self.storeAllInferences:
-                                annotatedName = frameFileName
-                                annotatedPath = frameFilePath
-       
-
-                        inference_obj = {
-                            'model_name': self.model_name,
-                            'object_detected': 0,
-                            'camera_id': self.camID,
-                            'camera_name': f"{self.camLocation}-{self.camPosition}",
-                            'raw_image_name': frameFileName,
-                            'raw_image_local_path': frameFilePath,
-                            'annotated_image_name': annotatedName,
-                            'annotated_image_path': annotatedPath,
-                            'inferencing_time': t_infer,
-                            'created': created,
-                            'unique_id': unique_id,
-                            'detected_objects': predictions
-                            }
+                        elif self.storeAllInferences:
+                            print("No object detected.")
+                            inference_obj = {
+                                'model_name': self.model_name,
+                                'object_detected': 0,
+                                'camera_id': self.camID,
+                                'camera_name': f"{self.camLocation}-{self.camPosition}",
+                                'raw_image_name': frameFileName,
+                                'raw_image_local_path': frameFilePath,
+                                'annotated_image_name': frameFileName,
+                                'annotated_image_path': frameFilePath,
+                                'inferencing_time': t_infer,
+                                'created': created,
+                                'unique_id': unique_id,
+                                'detected_objects': predictions
+                                }
 
                         sql_insert = InsertInference(self.SqlDb, self.SqlPwd, detection_count, inference_obj)           
                         self.send_to_upstream(json.dumps(inference_obj))
@@ -436,9 +406,6 @@ class Cam_File_Sink():
                             'unique_id': unique_id,
                             'detected_objects': predictions
                             }
-
-                            sql_insert = InsertInference(self.SqlDb, self.SqlPwd, detection_count, inference_obj)           
-                            self.send_to_upstream(json.dumps(inference_obj))
 
                         #   Frame upload
                             annotated_msg = {
@@ -512,7 +479,7 @@ class Cam_File_Sink():
 
                     print(f"Frame count = {self.frameCount}")
 
-                    FrameSave(frameFilePath, frame_optimized)
+                    FrameSave(frameFilePath, frame_resized)
 
                     if (self.storeRawFrames == True):
                         frame_msg = {
