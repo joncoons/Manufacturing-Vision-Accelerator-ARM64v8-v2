@@ -6,16 +6,6 @@ import os
 from datetime import datetime
 import tempfile
 
-# providers = [
-#     ('CUDAExecutionProvider', {
-#         'device_id': 0,
-#         'arena_extend_strategy': 'kSameAsRequested ',
-#         'gpu_mem_limit': 2 * 1024 * 1024 * 1024,
-#         'cudnn_conv_algo_search': 'DEFAULT',
-#         'do_copy_in_default_stream': True,
-#     }),
-#     'CPUExecutionProvider',
-# ]
 providers = [
     'CUDAExecutionProvider',
     'CPUExecutionProvider',
