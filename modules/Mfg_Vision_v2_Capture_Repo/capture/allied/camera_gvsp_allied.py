@@ -215,13 +215,20 @@ class Allied_GVSP_Camera:
                         pass   
 
             self.cycle_begin = time.time()
-            
-            if ((self.modelAcvOcr == True) and (self.modelAcvOcrSecondary != True)):
-                from inference.ocr_read import _process_frame_for_ocr
-                model_type = 'OCR'
-                frame_optimized = frame_resize(frame, self.targetDim, model = "ocr")
-                encodedFrame = cv2.imencode('.jpg', frame_optimized)[1].tobytes()
-                result = _process_frame_for_ocr(encodedFrame)
+
+            if self.modelAcvMultiClass:
+                from inference.ort_acv_mc_class import predict_acv_mc_class
+                model_type = 'Multi-Class Classification'
+                frame_optimized = frame_resize(frame, self.targetDim, model = "classification")
+                result = predict_acv_mc_class(frame_optimized)
+                predictions = result['predictions']
+                frame_resized = frame_optimized.copy()
+            elif self.modelAcvMultiLabel:
+                from inference.ort_acv_ml_class import predict_acv_ml_class
+                model_type = 'Multi-Class Classification'
+                frame_optimized = frame_resize(frame, self.targetDim, model = "classification")
+                result = predict_acv_ml_class(frame_optimized)
+                predictions = result['predictions']
                 frame_resized = frame_optimized.copy()
             elif self.modelAcvOD:
                 from inference.ort_acv_predict import predict_acv
@@ -272,7 +279,6 @@ class Allied_GVSP_Camera:
                 result = predict_class_multi_label(frame_optimized)
                 predictions = result['predictions']
                 frame_resized = frame_optimized.copy()
-                annotated_frame = frame_optimized.copy()
             elif self.modelClassMultiClass:
                 from inference.ort_class_multi_class import predict_class_multi_class
                 model_type = 'Multi-Class Classification'
@@ -280,14 +286,9 @@ class Allied_GVSP_Camera:
                 result = predict_class_multi_class(frame_optimized)
                 predictions = result['predictions']
                 frame_resized = frame_optimized.copy()
-                annotated_frame = frame_optimized.copy()
             else:
                 print("No model selected")
                 result = None
-
-            
-            if result is not None:
-                print(json.dumps(result))
 
             now = datetime.now()
             created = now.isoformat()
@@ -308,33 +309,7 @@ class Allied_GVSP_Camera:
                 t_infer = result["inference_time"]
                 print(f"Detection Count: {detection_count}")
 
-
-            if ((model_type == 'OCR') and (self.modelAcvOcrSecondary == False)):
-
-                    print(f'[{datetime.now()}] Results: {result["analyzeResult"]["readResults"]}')
-
-                    # Add additional logic to extract desired text from OCR if needed and/or annotate frame with
-                    # the bounding box of the text scene.
-
-                    ocr_inference_obj = {
-                        'model_name': self.model_name,
-                        'object_detected': obj_det_val,
-                        'camera_id': self.camID,
-                        'camera_name': f"{self.camLocation}-{self.camPosition}",
-                        'raw_image_name': frameFileName,
-                        'raw_image_local_path': frameFilePath,
-                        'annotated_image_name': frameFileName,
-                        'annotated_image_path': frameFilePath,
-                        'inferencing_time': t_infer,
-                        'created': created,
-                        'unique_id': unique_id,
-                        'detected_objects': result["analyzeResult"]["readResults"]
-                    }
-
-                    sql_insert = InsertInference(self.SqlDb, self.SqlPwd, detection_count, inference_obj)           
-                    self.send_to_upstream(json.dumps(inference_obj))
-
-            elif model_type == 'Object Detection':
+            if model_type == 'Object Detection':
                 # detection_count = len(result['predictions'][0])
                 # t_infer = result["inference_time"]
                 # print(f"Detection Count: {detection_count}")

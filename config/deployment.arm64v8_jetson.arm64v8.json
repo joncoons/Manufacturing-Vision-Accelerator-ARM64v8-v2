@@ -52,7 +52,7 @@
             "status": "stopped",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_cis_v2_monolithic:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_cis_v2_monolithic:0.1.83.0-arm64v8",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"IpcMode\":\"host\",\"gpus\":0,\"runtime\":\"nvidia\",\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/images_volume\",\"/home/edge_assets/model_sync:/model_volume\",\"/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_v2_Monolithic:/image_sink_volume\",\"/home/edge_assets/CIS_Config/Mfg_Vision_CIS_v2_Monolithic:/config\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images_volume\"}]}}"
             },
             "env": {
@@ -73,7 +73,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_cis_v2_modular:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_cis_v2_modular:0.1.83.0-arm64v8",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"IpcMode\":\"host\",\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/images_volume\",\"/home/edge_assets/model_sync:/model_volume\",\"/home/edge_assets/inference_volume:/app/inference\",\"/home/edge_assets/capture_volume:/app/capture\",\"/home/edge_assets/image_sink_volume/Mfg_Vision_CIS_v2_Modular:/image_sink_volume\",\"/home/edge_assets/CIS_Config/Mfg_Vision_CIS_v2_Modular:/config\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Tar",
               "createOptions01": "get\":\"/var/opt/images_volume\"}]}}"
             },
@@ -86,7 +86,7 @@
           "Mfg_Vision_v2_Model_Sync": {
             "startupOrder": 2,
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_model_sync:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_model_sync:0.1.83.0-arm64v8",
               "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/edge_assets/model_sync:/models\"]}}"
             },
             "type": "docker",
@@ -112,7 +112,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_capture_repo:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_capture_repo:0.1.83.0-arm64v8",
               "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/edge_assets/capture_volume:/capture_volume\"]},\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"capture_volume\",\"Target\":\"/var/opt/capture_volume\"}]}"
             }
           },
@@ -123,7 +123,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_inference_repo:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_inference_repo:0.1.83.0-arm64v8",
               "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/edge_assets/inference_volume:/inference_volume\",\"/home/edge_assets/image_sink_volume/test_images:/test_images\"]},\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"inference_volume\",\"Target\":\"/var/opt/inference_volume\"}]}"
             }
           },
@@ -133,7 +133,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_image_upload:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_image_upload:0.1.83.0-arm64v8",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/images_volume\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images\"}]}}"
             },
             "env": {
@@ -151,7 +151,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_file_cleanup:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_file_cleanup:0.1.83.0-arm64v8",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/images_volume\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images_volume\"}]}}"
             },
             "env": {
@@ -166,7 +166,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_mysql:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_mysql:0.1.83.0-arm64v8",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/mysql_data:/var/lib_mysql\"],\"PortBindings\":{\"3306/tcp\":[{\"HostPort\":\"3306\"}]}},\"Env\":[\"MYSQL_DATABASE=defectdb\",\"MYSQL_USER=SA\",\"MYSQL_PASSWORD=Password123\"]}"
             }
           },
@@ -176,7 +176,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_dashboard_custom:0.1.82.0-arm64v8",
+              "image": "aiotdevopsacr.azurecr.io/mfg_vision_v2_dashboard_custom:0.1.83.0-arm64v8",
               "createOptions": "{\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"HostConfig\":{\"PortBindings\":{\"80/tcp\":[{\"HostPort\":\"22000\"}]},\"IpcMode\":\"host\",\"NetworkMode\":\"host\",\"Binds\":[\"/home/edge_assets/images_volume:/app/static/images\"],\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"images_volume\",\"Target\":\"/var/opt/images_volume\"}]}}"
             },
             "env": {
