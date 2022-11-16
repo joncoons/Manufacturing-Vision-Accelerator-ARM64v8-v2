@@ -20,7 +20,7 @@ class HubConnector():
 
     def __init__(self):
         self.client = IoTHubModuleClient.create_from_edge_environment()
-        # self.client = IoTHubModuleClient.create_from_connection_string("module connection string")
+        # self.client = IoTHubModuleClient.create_from_connection_string("HostName=AIoT-Dev-Ops-Hub.azure-devices.net;DeviceId=Edge_of_AI_Xavier_v2;ModuleId=Mfg_Vision_CIS_v2_Monolithic;SharedAccessKey=8r95AG5xDTTVl7p7rlTQZY+cTaWxa2WVnVeqwcJApqY=")
         self.client.connect()
 
     def send_to_output(self, message: Union[Message, str], outputQueueName: str):

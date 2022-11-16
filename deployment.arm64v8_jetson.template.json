@@ -22,7 +22,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.4.0-linux-arm64v8",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
               "createOptions": {}
             },
             "env": {
@@ -36,7 +36,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.4.0-linux-arm64v8",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
@@ -70,7 +70,7 @@
           "Mfg_Vision_CIS_v2_Monolithic": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.Mfg_Vision_CIS_v2_Monolithic}",

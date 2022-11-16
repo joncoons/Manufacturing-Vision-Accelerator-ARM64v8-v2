@@ -18,6 +18,7 @@ stop_event = threading.Event()
 
 def create_client():
     client = IoTHubModuleClient.create_from_edge_environment()
+    # client = IoTHubModuleClient.create_from_connection_string("HostName=AIoT-Dev-Ops-Hub.azure-devices.net;DeviceId=Edge_of_AI_AMD_v2;ModuleId=Mfg_Vision_Image_Upload;SharedAccessKey=T1HevF9O1RpTwpmDES3bcCw4VWsy7JIn6uNdtWWssA4=")
     async def receive_message_handler(message):
         if message.input_name in ("inputImageSend"):
             message = message.data

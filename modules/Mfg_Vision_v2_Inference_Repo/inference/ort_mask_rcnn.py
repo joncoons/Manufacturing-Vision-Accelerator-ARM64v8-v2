@@ -49,11 +49,13 @@ class ONNXRuntimeObjectDetection():
         output_names = [output.name for output in sess_output]
         outputs = self.session.run(output_names=output_names, input_feed={sess_input[0].name:pre_image})
         
-        def _get_box_dims(image_shape, box):
+        def _get_box_dims(box):
+        # def _get_box_dims(image_shape, box):
             box_keys = ['xmin', 'ymin', 'xmax', 'ymax']
-            height, width = image_shape[0], image_shape[1]
-            print(f"height: {height}, width: {width}")
-            bbox = dict(zip(box_keys, [int(coordinate.item()) for coordinate in box]))
+            # height, width = image_shape[0], image_shape[1]
+            # print(f"height: {height}, width: {width}")
+            # bbox = dict(zip(box_keys, [int(coordinate.item()) for coordinate in box]))
+            bbox = dict(zip(box_keys, [(coordinate.item()) for coordinate in box]))
             return bbox
 
         def _get_prediction(boxes, labels, scores, masks, image_shape, classes):
@@ -61,6 +63,7 @@ class ONNXRuntimeObjectDetection():
             filetime = now.strftime("%Y%d%m%H%M%S%f")
             annotatedName = f"mask-{filetime}-annotated.jpg"
             annotatedPath = os.path.join('/images_volume', annotatedName)
+
             raw_pred = []
             
             color = (0, 255, 0)
@@ -68,7 +71,8 @@ class ONNXRuntimeObjectDetection():
             for mask, box, label_index, score in zip(masks, boxes, labels, scores):
                 if score <= self.target_prob:
                     continue
-                bbox = _get_box_dims(image_shape, box)
+                bbox = _get_box_dims(box)
+                # bbox = _get_box_dims(image_shape, box)
                 probability = round(score.item(),2)
                 labelId = label_index.item()
                 labelName = classes[label_index]
